@@ -53,52 +53,52 @@ def ibuild_keyboard(buttons):
 
 
 def main_menu():
-    text = f"Claey𝚉 Stats\
-        \n 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝙱𝚢 {mention}"
+    text = f"🇦​🇸​🇸​🇮​🇸​🇹​🇦​🇳​🇹​ ѕтαтѕ\
+        \nρσωєяє∂ ву {mention}"
     buttons = [
         (
             Button.inline(
-                f"ℹ️ Info",
+                f"ℹ️ ιиfσ",
                 data="check",
             ),
         ),
         (
             Button.inline(
-                f"👮‍♂️ Admin ({len(GRP_INFO['admin'])})",
+                f"👮‍♂️ α∂мιи ({len(GRP_INFO['admin'])})",
                 data=f"admin_menu",
             ),
             Button.inline(
-                f"🤖 Bot ({len(GRP_INFO['bot'])})",
+                f"🤖 вσт ({len(GRP_INFO['bot'])})",
                 data=f"bot_menu",
             ),
         ),
         (
             Button.inline(
-                f"🎨 Fun ({len(GRP_INFO['fun'])})",
+                f"🎨 fυи ({len(GRP_INFO['fun'])})",
                 data=f"fun_menu",
             ),
             Button.inline(
-                f"🧩 Misc ({len(GRP_INFO['misc'])})",
+                f"🧩 мιѕ¢ ({len(GRP_INFO['misc'])})",
                 data=f"misc_menu",
             ),
         ),
         (
             Button.inline(
-                f"🧰 Tools ({len(GRP_INFO['tools'])})",
+                f"🧰 тσσℓѕ ({len(GRP_INFO['tools'])})",
                 data=f"tools_menu",
             ),
             Button.inline(
-                f"🗂 Utils ({len(GRP_INFO['utils'])})",
+                f"🗂 υтιℓѕ ({len(GRP_INFO['utils'])})",
                 data=f"utils_menu",
             ),
         ),
         (
             Button.inline(
-                f"➕ Extra ({len(GRP_INFO['extra'])})",
+                f"➕ єχтяα ({len(GRP_INFO['extra'])})",
                 data=f"extra_menu",
             ),
             Button.inline(
-                f"🔒 Close Menu",
+                f"🔒 ¢ℓσѕє мєиυ",
                 data=f"close",
             ),
         ),
@@ -420,8 +420,8 @@ async def inline_handler(event):  # sourcery no-metrics
         elif string == "help":
             _result = main_menu()
             result = builder.article(
-                title="© CatUserbot Help",
-                description="Help menu for CatUserbot",
+                title="© мα-υѕєяbot Help",
+                description="Help menu for мα-Userbot",
                 text=_result[0],
                 buttons=_result[1],
                 link_preview=False,
@@ -470,7 +470,7 @@ async def inline_handler(event):  # sourcery no-metrics
                     id=str(uuid4()),
                     type="photo",
                     title=link,
-                    description="⬇️ Click to Download",
+                    description="⬇️ Click to Download ⬇️",
                     thumb=photo,
                     content=photo,
                     send_message=types.InputBotInlineMessageMediaAuto(
@@ -523,7 +523,7 @@ async def inline_handler(event):  # sourcery no-metrics
             await event.answer([result] if result else None)
         elif string == "pmpermit":
             buttons = [
-                Button.inline(text="Show Options.", data="show_pmpermit_options"),
+                Button.inline(text="ѕнσω мα dαми σρтισиѕ", data="show_pmpermit_options"),
             ]
             PM_PIC = gvarstatus("pmpermit_pic")
             if PM_PIC:
@@ -536,20 +536,20 @@ async def inline_handler(event):  # sourcery no-metrics
             if CAT_IMG and CAT_IMG.endswith((".jpg", ".jpeg", ".png")):
                 result = builder.photo(
                     CAT_IMG,
-                    # title="Alive cat",
+                    # title="Alive",
                     text=query,
                     buttons=buttons,
                 )
             elif CAT_IMG:
                 result = builder.document(
                     CAT_IMG,
-                    title="Alive cat",
+                    title="Alive",
                     text=query,
                     buttons=buttons,
                 )
             else:
                 result = builder.article(
-                    title="Alive cat",
+                    title="Alive",
                     text=query,
                     buttons=buttons,
                 )
