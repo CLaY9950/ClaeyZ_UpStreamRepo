@@ -19,6 +19,7 @@ from telethon.tl.types import (
     UserStatusOnline,
     UserStatusRecently,
 )
+from telethon.utils import get_display_name
 
 from userbot import catub
 
@@ -83,9 +84,7 @@ async def kickme(leave):
 )
 async def _(event):
     "To kick everyone from group."
-    result = await event.client(
-        functions.channels.GetParticipantRequest(event.chat_id, event.client.uid)
-    )
+    result = await event.client.get_permissions(event.chat_id, event.client.uid)
     if not result.participant.admin_rights.ban_users:
         return await edit_or_reply(
             event, "`It seems like you dont have ban users permission in this group.`"
@@ -127,9 +126,7 @@ async def _(event):
 )
 async def _(event):
     "To ban everyone from group."
-    result = await event.client(
-        functions.channels.GetParticipantRequest(event.chat_id, event.client.uid)
-    )
+    result = await event.client.get_permissions(event.chat_id, event.client.uid)
     if not result:
         return await edit_or_reply(
             event, "`It seems like you dont have ban users permission in this group.`"
@@ -178,7 +175,7 @@ async def _(event):
     succ = 0
     total = 0
     flag = False
-    chat = await event.get_chat()
+    await event.get_chat()
     async for i in event.client.iter_participants(
         event.chat_id, filter=ChannelParticipantsKicked, aggressive=True
     ):
@@ -209,7 +206,9 @@ async def _(event):
                     )
             except MessageNotModifiedError:
                 pass
-    await catevent.edit(f"**Unbanned :**__{succ}/{total} in the chat {chat.title}__")
+    await catevent.edit(
+        f"**Unbanned :**__{succ}/{total} in the chat {get_display_name(await event.get_chat())}__"
+    )
 
 
 # Ported by ©[NIKITA](t.me/kirito6969) and ©[EYEPATCH](t.me/NeoMatrix90)
@@ -274,7 +273,7 @@ async def rm_deletedacc(show):
             BOTLOG_CHATID,
             f"#CLEANUP\
             \n{del_status}\
-            \nCHAT: {show.chat.title}(`{show.chat_id}`)",
+            \nCHAT: {get_display_name(await event.get_chat())}(`{show.chat_id}`)",
         )
 
 

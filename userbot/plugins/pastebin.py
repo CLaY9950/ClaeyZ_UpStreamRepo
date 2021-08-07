@@ -66,14 +66,14 @@ async def paste_img(event):
     text_to_print = ""
     if input_str:
         text_to_print = input_str
-    if text_to_print == "" and reply.media:
+    if text_to_print == "" and reply and reply.media:
         mediatype = media_type(reply)
         if mediatype == "Document":
             d_file_name = await event.client.download_media(reply, Config.TEMP_DIR)
             with open(d_file_name, "r") as f:
                 text_to_print = f.read()
     if text_to_print == "":
-        if reply.text:
+        if reply and reply.text:
             text_to_print = reply.raw_text
         else:
             return await edit_delete(
@@ -140,7 +140,7 @@ async def paste_bin(event):
     text_to_print = ""
     if input_str:
         text_to_print = input_str
-    if text_to_print == "" and reply.media:
+    if text_to_print == "" and reply and reply.media:
         mediatype = media_type(reply)
         if mediatype == "Document":
             d_file_name = await event.client.download_media(reply, Config.TEMP_DIR)
@@ -149,7 +149,7 @@ async def paste_bin(event):
             with open(d_file_name, "r") as f:
                 text_to_print = f.read()
     if text_to_print == "":
-        if reply.text:
+        if reply and reply.text:
             text_to_print = reply.raw_text
         else:
             return await edit_delete(
@@ -214,7 +214,7 @@ async def get_dogbin_content(event):
                 ("pasty" in iurl)
                 or ("spaceb" in iurl)
                 or ("nekobin" in iurl)
-                or ("dog" in iurl)
+                or ("catbin" in iurl)
             ):
                 url = iurl
                 break
@@ -232,8 +232,10 @@ async def get_dogbin_content(event):
             rawurl = f"https://spaceb.in/api/v1/documents/{fid[0]}/raw"
         elif "nekobin" in url:
             rawurl = f"nekobin.com/raw/{fid[0]}"
-        elif "dog" in url:
-            rawurl = f"https://del.dog/raw/{fid[0]}"
+        elif "catbin" in url:
+            rawurl = f"http://catbin.up.railway.app/raw/{fid[0]}"
+        else:
+            return await edit_delete(event, "__This pastebin is not supported.__")
     resp = requests.get(rawurl)
     try:
         resp.raise_for_status()
@@ -270,14 +272,14 @@ async def _(event):
     text_to_print = ""
     if input_str:
         text_to_print = input_str
-    if text_to_print == "" and reply.media:
+    if text_to_print == "" and reply and reply.media:
         mediatype = media_type(reply)
         if mediatype == "Document":
             d_file_name = await event.client.download_media(reply, Config.TEMP_DIR)
             with open(d_file_name, "r") as f:
                 text_to_print = f.read()
     if text_to_print == "":
-        if reply.text:
+        if reply and reply.text:
             text_to_print = reply.raw_text
         else:
             return await edit_delete(

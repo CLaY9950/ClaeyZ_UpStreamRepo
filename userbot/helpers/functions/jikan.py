@@ -6,9 +6,12 @@ from io import BytesIO, StringIO
 import bs4
 import jikanpy
 import requests
+from aiohttp import ClientSession
 from jikanpy import Jikan
 from telethon.tl.types import DocumentAttributeAnimated
 from telethon.utils import is_video
+
+from ..tools import post_to_telegraph
 
 jikan = Jikan()
 url = "https://graphql.anilist.co"
@@ -161,6 +164,82 @@ query ($id: Int,$search: String) {
     }
 """
 
+ANIME_QUERY = """
+query ($id: Int, $idMal:Int, $search: String, $type: MediaType, $asHtml: Boolean) {
+  Media (id: $id, idMal: $idMal, search: $search, type: $type) {
+    id
+    idMal
+    title {
+      romaji
+      english
+      native
+    }
+    format
+    status
+    description (asHtml: $asHtml)
+    startDate {
+      year
+      month
+      day
+    }
+    season
+    episodes
+    duration
+    countryOfOrigin
+    source (version: 2)
+    trailer {
+      id
+      site
+      thumbnail
+    }
+    coverImage {
+      extraLarge
+    }
+    bannerImage
+    genres
+    averageScore
+    nextAiringEpisode {
+      airingAt
+      timeUntilAiring
+      episode
+    }
+    isAdult
+    characters (role: MAIN, page: 1, perPage: 10) {
+      nodes {
+        id
+        name {
+          full
+          native
+        }
+        image {
+          large
+        }
+        description (asHtml: $asHtml)
+        siteUrl
+      }
+    }
+    studios (isMain: true) {
+      nodes {
+        name
+        siteUrl
+      }
+    }
+    siteUrl
+  }
+}
+"""
+
+
+async def anime_json_synomsis(query, vars_):
+    """Makes a Post to https://graphql.anilist.co."""
+    url_ = "https://graphql.anilist.co"
+    async with ClientSession() as session:
+        async with session.post(
+            url_, json={"query": query, "variables": vars_}
+        ) as post_con:
+            json_data = await post_con.json()
+    return json_data
+
 
 def getPosterLink(mal):
     # grab poster from kitsu
@@ -202,15 +281,15 @@ def getBannerLink(mal, kitsu_search=True):
     return getPosterLink(mal)
 
 
-def get_anime_manga(mal_id, search_type, _user_id):  # sourcery no-metrics
+async def get_anime_manga(mal_id, search_type, _user_id):  # sourcery no-metrics
     jikan = jikanpy.jikan.Jikan()
     if search_type == "anime_anime":
         result = jikan.anime(mal_id)
         trailer = result["trailer_url"]
         if trailer:
-            LOL = f"<a href='{trailer}'>Trailer</a>"
+            TRAILER = f"<a href='{trailer}'>🎬 Trailer</a>"
         else:
-            LOL = "<i>No Trailer Available</i>"
+            TRAILER = "🎬 <i>No Trailer Available</i>"
         image = getBannerLink(mal_id)
         studio_string = ", ".join(
             studio_info["name"] for studio_info in result["studios"]
@@ -247,6 +326,53 @@ def get_anime_manga(mal_id, search_type, _user_id):  # sourcery no-metrics
         if result[entity] is None:
             result[entity] = "Unknown"
     if search_type == "anime_anime":
+        anime_malid = result["mal_id"]
+        anime_result = await anime_json_synomsis(
+            ANIME_QUERY, {"idMal": anime_malid, "asHtml": True, "type": "ANIME"}
+        )
+        anime_data = anime_result["data"]["Media"]
+        html_char = ""
+        for character in anime_data["characters"]["nodes"]:
+            html_ = ""
+            html_ += "<br>"
+            html_ += f"""<a href="{character['siteUrl']}">"""
+            html_ += f"""<img src="{character['image']['large']}"/></a>"""
+            html_ += "<br>"
+            html_ += f"<h3>{character['name']['full']}</h3>"
+            html_ += f"<em>{character['name']['native']}</em><br>"
+            html_ += f"<b>Character ID</b>: {character['id']}<br>"
+            html_ += f"<h4>About Character and Role:</h4>{character.get('description', 'N/A')}"
+            html_char += f"{html_}<br><br>"
+        studios = "".join(
+            "<a href='{}'>• {}</a> ".format(studio["siteUrl"], studio["name"])
+            for studio in anime_data["studios"]["nodes"]
+        )
+        coverImg = anime_data.get("coverImage")["extraLarge"]
+        bannerImg = anime_data.get("bannerImage")
+        anime_data.get("siteUrl")
+        title_img = coverImg or bannerImg
+        romaji = anime_data["title"]["romaji"]
+        native = anime_data["title"]["native"]
+        english = anime_data["title"]["english"]
+        # Telegraph Post mejik
+        html_pc = ""
+        html_pc += f"<h1>{native}</h1>"
+        html_pc += "<h3>Synopsis:</h3>"
+        html_pc += result["synopsis"] or "Unknown"
+        html_pc += "<br>"
+        if html_char:
+            html_pc += "<h2>Main Characters:</h2>"
+            html_pc += html_char
+            html_pc += "<br><br>"
+        html_pc += "<h3>More Info:</h3>"
+        html_pc += f"<br><b>Studios:</b> {studios}<br>"
+        html_pc += (
+            f"<a href='https://myanimelist.net/anime/{anime_malid}'>View on MAL</a>"
+        )
+        html_pc += f"<a href='{url}'> View on anilist.co</a>"
+        html_pc += f"<img src='{bannerImg}'/>"
+        title_h = english or romaji
+    if search_type == "anime_anime":
         caption += textwrap.dedent(
             f"""
         🆎 <b>Type</b>: <i>{result['type']}</i>
@@ -259,10 +385,16 @@ def get_anime_manga(mal_id, search_type, _user_id):  # sourcery no-metrics
         🎭 <b>Genres</b>: <i>{genre_string}</i>
         🎙️ <b>Studios</b>: <i>{studio_string}</i>
         💸 <b>Producers</b>: <i>{producer_string}</i>
-        🎬 <b>Trailer:</b> {LOL}
-        📖 <b>Synopsis</b>: <i>{synopsis_string}</i> <a href='{result['url']}'>Read More</a>
         """
         )
+        synopsis_link = await post_to_telegraph(
+            title_h,
+            f"<img src='{title_img}' title={romaji}/>\n"
+            + f"<code>{caption}</code>\n"
+            + f"{TRAILER}\n"
+            + html_pc,
+        )
+        caption += f"<b>{TRAILER}</b>\n📖 <a href='{synopsis_link}'><b>Synopsis</b></a> <b>&</b> <a href='{result['url']}'><b>Read More</b></a>"
     elif search_type == "anime_manga":
         caption += textwrap.dedent(
             f"""
@@ -334,10 +466,10 @@ async def callAPI(search_str):
     return response.text
 
 
-def memory_file(name=None, contents=None, *, bytes=True):
-    if isinstance(contents, str) and bytes:
+def memory_file(name=None, contents=None, *, temp_bytes=True):
+    if isinstance(contents, str) and temp_bytes:
         contents = contents.encode()
-    file = BytesIO() if bytes else StringIO()
+    file = BytesIO() if temp_bytes else StringIO()
     if name:
         file.name = name
     if contents:

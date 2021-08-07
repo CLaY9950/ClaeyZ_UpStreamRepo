@@ -829,25 +829,7 @@ async def lists(gdrive, folderlink=None):  # sourcery no-metrics
     else:
         page_size = 25  # default page_size is 25
     checker = gdrive.pattern_match.group(2)
-    if checker != "":
-        if checker.startswith("-p"):
-            parents = checker.split(None, 2)[1]
-            parents = parents.split("/")[-1]
-            try:
-                name = checker.split(None, 2)[2]
-            except IndexError:
-                query = f"'{parents}' in parents and (name contains '*')"
-            else:
-                query = f"'{parents}' in parents and (name contains '{name}')"
-        else:
-            if re.search("-p ([\s\S]*)", checker):
-                parents = re.search("-p ([\s\S]*)", checker).group(1)
-                name = checker.split("-p")[0].strip()
-                query = f"'{parents}' in parents and (name contains '{name}')"
-            else:
-                name = checker
-                query = f"name contains '{name}'"
-    else:
+    if checker == "":
         try:
             if GDRIVE_.parent_Id is not None:
                 query = f"'{GDRIVE_.parent_Id}' in parents and (name contains '*')"
@@ -856,6 +838,22 @@ async def lists(gdrive, folderlink=None):  # sourcery no-metrics
                 query = f"'{G_DRIVE_FOLDER_ID}' in parents and (name contains '*')"
             else:
                 query = ""
+    elif checker.startswith("-p"):
+        parents = checker.split(None, 2)[1]
+        parents = parents.split("/")[-1]
+        try:
+            name = checker.split(None, 2)[2]
+        except IndexError:
+            query = f"'{parents}' in parents and (name contains '*')"
+        else:
+            query = f"'{parents}' in parents and (name contains '{name}')"
+    elif re.search("-p ([\s\S]*)", checker):
+        parents = re.search("-p ([\s\S]*)", checker).group(1)
+        name = checker.split("-p")[0].strip()
+        query = f"'{parents}' in parents and (name contains '{name}')"
+    else:
+        name = checker
+        query = f"name contains '{name}'"
     service = await create_app(gdrive)
     if service is False:
         return False
@@ -1440,21 +1438,20 @@ async def set_upload_folder(gdrive):
             "**[FOLDER - SET]**\n\n" "**Status : **`OK- using G_DRIVE_FOLDER_ID now.`"
         )
         return None
+    try:
+        GDRIVE_.parent_id = ""
+    except NameError:
+        await gdrive.edit(
+            "**[FOLDER - SET]**\n\n" "**Status : **`BAD - No parent_Id is set.`"
+        )
+        return False
     else:
-        try:
-            GDRIVE_.parent_id = ""
-        except NameError:
-            await gdrive.edit(
-                "**[FOLDER - SET]**\n\n" "**Status : **`BAD - No parent_Id is set.`"
-            )
-            return False
-        else:
-            await gdrive.edit(
-                "**[FOLDER - SET]**\n\n"
-                "**Status : **`OK`"
-                " - `G_DRIVE_FOLDER_ID empty, will use root.`"
-            )
-            return None
+        await gdrive.edit(
+            "**[FOLDER - SET]**\n\n"
+            "**Status : **`OK`"
+            " - `G_DRIVE_FOLDER_ID empty, will use root.`"
+        )
+        return None
 
 
 @catub.cat_cmd(
@@ -1487,17 +1484,15 @@ async def set_upload_folder(gdrive):
                 "**[PARENT - FOLDER]**\n\n" "**Status : **`OK - Successfully changed.`"
             )
             return None
-        else:
-            await gdrive.edit(
-                "**[PARENT - FOLDER]**\n\n" "**Status : WARNING** -` forcing use...`"
-            )
-            GDRIVE_.parent_Id = inp
+        await gdrive.edit(
+            "**[PARENT - FOLDER]**\n\n" "**Status : WARNING** -` forcing use...`"
+        )
+        GDRIVE_.parent_Id = inp
     else:
         GDRIVE_.parent_Id, _ = await get_file_id(ext_id)
         await gdrive.edit(
             "**[PARENT - FOLDER]**\n\n" "**Status : **`OK - Successfully changed.`"
         )
-    return
 
 
 @catub.cat_cmd(

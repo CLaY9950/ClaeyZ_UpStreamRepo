@@ -1,6 +1,5 @@
 from asyncio import sleep
 
-from telethon import functions
 from telethon.errors import (
     BadRequestError,
     ImageProcessFailedError,
@@ -19,6 +18,7 @@ from telethon.tl.types import (
     InputChatPhotoEmpty,
     MessageMediaPhoto,
 )
+from telethon.utils import get_display_name
 
 from userbot import catub
 
@@ -126,7 +126,7 @@ async def set_group_photo(event):  # sourcery no-metrics
             BOTLOG_CHATID,
             "#GROUPPIC\n"
             f"Group profile pic {process} successfully "
-            f"CHAT: {event.chat.title}(`{event.chat_id}`)",
+            f"CHAT: {get_display_name(await event.get_chat())}(`{event.chat_id}`)",
         )
 
 
@@ -171,7 +171,7 @@ async def promote(event):
             BOTLOG_CHATID,
             f"#PROMOTE\
             \nUSER: [{user.first_name}](tg://user?id={user.id})\
-            \nCHAT: {event.chat.title} (`{event.chat_id}`)",
+            \nCHAT: {get_display_name(await event.get_chat())} (`{event.chat_id}`)",
         )
 
 
@@ -215,7 +215,7 @@ async def demote(event):
             BOTLOG_CHATID,
             f"#DEMOTE\
             \nUSER: [{user.first_name}](tg://user?id={user.id})\
-            \nCHAT: {event.chat.title}(`{event.chat_id}`)",
+            \nCHAT: {get_display_name(await event.get_chat())}(`{event.chat_id}`)",
         )
 
 
@@ -268,7 +268,7 @@ async def _ban_person(event):
                 BOTLOG_CHATID,
                 f"#BAN\
                 \nUSER: [{user.first_name}](tg://user?id={user.id})\
-                \nCHAT: {event.chat.title}(`{event.chat_id}`)\
+                \nCHAT: {get_display_name(await event.get_chat())}(`{event.chat_id}`)\
                 \nREASON : {reason}",
             )
         else:
@@ -276,7 +276,7 @@ async def _ban_person(event):
                 BOTLOG_CHATID,
                 f"#BAN\
                 \nUSER: [{user.first_name}](tg://user?id={user.id})\
-                \nCHAT: {event.chat.title}(`{event.chat_id}`)",
+                \nCHAT: {get_display_name(await event.get_chat())}(`{event.chat_id}`)",
             )
 
 
@@ -311,7 +311,7 @@ async def nothanos(event):
                 BOTLOG_CHATID,
                 "#UNBAN\n"
                 f"USER: [{user.first_name}](tg://user?id={user.id})\n"
-                f"CHAT: {event.chat.title}(`{event.chat_id}`)",
+                f"CHAT: {get_display_name(await event.get_chat())}(`{event.chat_id}`)",
             )
     except UserIdInvalidError:
         await catevent.edit("`Uh oh my unban logic broke!`")
@@ -384,9 +384,7 @@ async def startmute(event):
             return await edit_or_reply(
                 event, "`This user is already muted in this chat ~~lmfao sed rip~~`"
             )
-        result = await event.client(
-            functions.channels.GetParticipantRequest(event.chat_id, user.id)
-        )
+        result = await event.client.get_permissions(event.chat_id, user.id)
         try:
             if result.participant.banned_rights.send_messages:
                 return await edit_or_reply(
@@ -416,20 +414,20 @@ async def startmute(event):
         if reason:
             await edit_or_reply(
                 event,
-                f"{_format.mentionuser(user.first_name ,user.id)} `is muted in {event.chat.title}`\n"
+                f"{_format.mentionuser(user.first_name ,user.id)} `is muted in {get_display_name(await event.get_chat())}`\n"
                 f"`Reason:`{reason}",
             )
         else:
             await edit_or_reply(
                 event,
-                f"{_format.mentionuser(user.first_name ,user.id)} `is muted in {event.chat.title}`\n",
+                f"{_format.mentionuser(user.first_name ,user.id)} `is muted in {get_display_name(await event.get_chat())}`\n",
             )
         if BOTLOG:
             await event.client.send_message(
                 BOTLOG_CHATID,
                 "#MUTE\n"
                 f"**User :** [{user.first_name}](tg://user?id={user.id})\n"
-                f"**Chat :** {event.chat.title}(`{event.chat_id}`)",
+                f"**Chat :** {get_display_name(await event.get_chat())}(`{event.chat_id}`)",
             )
 
 
@@ -478,9 +476,7 @@ async def endmute(event):
             if is_muted(user.id, event.chat_id):
                 unmute(user.id, event.chat_id)
             else:
-                result = await event.client(
-                    functions.channels.GetParticipantRequest(event.chat_id, user.id)
-                )
+                result = await event.client.get_permissions(event.chat_id, user.id)
                 if result.participant.banned_rights.send_messages:
                     await event.client(
                         EditBannedRequest(event.chat_id, user.id, UNBAN_RIGHTS)
@@ -494,14 +490,14 @@ async def endmute(event):
             return await edit_or_reply(event, f"**Error : **`{str(e)}`")
         await edit_or_reply(
             event,
-            f"{_format.mentionuser(user.first_name ,user.id)} `is unmuted in {event.chat.title}\n乁( ◔ ౪◔)「    ┑(￣Д ￣)┍`",
+            f"{_format.mentionuser(user.first_name ,user.id)} `is unmuted in {get_display_name(await event.get_chat())}\n乁( ◔ ౪◔)「    ┑(￣Д ￣)┍`",
         )
         if BOTLOG:
             await event.client.send_message(
                 BOTLOG_CHATID,
                 "#UNMUTE\n"
                 f"**User :** [{user.first_name}](tg://user?id={user.id})\n"
-                f"**Chat :** {event.chat.title}(`{event.chat_id}`)",
+                f"**Chat :** {get_display_name(await event.get_chat())}(`{event.chat_id}`)",
             )
 
 
@@ -541,7 +537,7 @@ async def endmute(event):
             BOTLOG_CHATID,
             "#KICK\n"
             f"USER: [{user.first_name}](tg://user?id={user.id})\n"
-            f"CHAT: {event.chat.title}(`{event.chat_id}`)\n",
+            f"CHAT: {get_display_name(await event.get_chat())}(`{event.chat_id}`)\n",
         )
 
 
@@ -578,7 +574,7 @@ async def pin(event):
             BOTLOG_CHATID,
             f"#PIN\
                 \n__successfully pinned a message in chat__\
-                \nCHAT: {event.chat.title}(`{event.chat_id}`)\
+                \nCHAT: {get_display_name(await event.get_chat())}(`{event.chat_id}`)\
                 \nLOUD: {is_silent}",
         )
 
@@ -626,7 +622,7 @@ async def pin(event):
             BOTLOG_CHATID,
             f"#UNPIN\
                 \n__successfully unpinned message(s) in chat__\
-                \nCHAT: {event.chat.title}(`{event.chat_id}`)",
+                \nCHAT: {get_display_name(await event.get_chat())}(`{event.chat_id}`)",
         )
 
 

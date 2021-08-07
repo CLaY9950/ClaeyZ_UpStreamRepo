@@ -20,7 +20,7 @@ import urllib
 import emoji
 from fontTools.ttLib import TTFont
 from PIL import Image, ImageDraw, ImageFont, ImageOps
-from telethon.tl import functions, types
+from telethon.tl import types
 
 from .utils import _catutils
 
@@ -96,9 +96,7 @@ async def process(msg, user, client, reply, replied=None):
 
     title = ""
     try:
-        details = await client(
-            functions.channels.GetParticipantRequest(reply.chat_id, user.id)
-        )
+        details = await client.get_permissions(reply.chat_id, user.id)
         if isinstance(details.participant, types.ChannelParticipantCreator):
             title = details.participant.rank if details.participant.rank else "Creator"
         elif isinstance(details.participant, types.ChannelParticipantAdmin):

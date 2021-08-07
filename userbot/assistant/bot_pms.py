@@ -177,7 +177,7 @@ async def bot_pms(event):  # sourcery no-metrics
                     )
                 else:
                     msg = await event.client.send_message(
-                        user_id, event.text, reply_to=reply_msg
+                        user_id, event.text, reply_to=reply_msg, link_preview=False
                     )
             except UserIsBlockedError:
                 return await event.reply("𝗧𝗵𝗶𝘀 𝗯𝗼𝘁 𝘄𝗮𝘀 𝗯𝗹𝗼𝗰𝗸𝗲𝗱 𝗯𝘆 𝘁𝗵𝗲 𝘂𝘀𝗲𝗿. ❌")
@@ -470,9 +470,9 @@ async def antif_on_msg(event):
     user_id = chat.id
     if check_is_black_list(user_id):
         raise StopPropagation
-    elif await is_flood(user_id):
+    if await is_flood(user_id):
         await send_flood_alert(chat)
         FloodConfig.BANNED_USERS.add(user_id)
         raise StopPropagation
-    elif user_id in FloodConfig.BANNED_USERS:
+    if user_id in FloodConfig.BANNED_USERS:
         FloodConfig.BANNED_USERS.remove(user_id)
