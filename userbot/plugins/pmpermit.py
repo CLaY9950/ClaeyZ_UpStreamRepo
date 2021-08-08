@@ -82,7 +82,7 @@ async def do_pm_permit_action(event, chat):  # sourcery no-metrics
                 remwarns=remwarns,
             )
         else:
-            USER_BOT_WARN_ZERO = f"**You were spamming my master** {my_mention}**'s inbox, henceforth you have been blocked.**"
+            USER_BOT_WARN_ZERO = f"**You were spamming my master** {my_mention}**'s inbox, henceforth you have been blocked.\n Now Feck oFF!**"
         msg = await event.reply(USER_BOT_WARN_ZERO)
         await event.client(functions.contacts.BlockRequest(chat.id))
         the_message = f"#BLOCKED_PM\
@@ -121,7 +121,7 @@ async def do_pm_permit_action(event, chat):  # sourcery no-metrics
     elif gvarstatus("pmmenu") is None:
         USER_BOT_NO_WARN = f"""__Hi__ {mention}__, I haven't approved you yet to personal message me. 
 
-You have {warns}/{totalwarns} warns until you get blocked by the CatUserbot.
+You have {warns}/{totalwarns} warns until you get blocked by Me.
 
 Choose an option from below to specify the reason of your message and wait for me to check it. __⬇️"""
     else:
