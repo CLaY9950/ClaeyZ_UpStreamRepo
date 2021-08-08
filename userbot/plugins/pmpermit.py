@@ -119,7 +119,7 @@ async def do_pm_permit_action(event, chat):  # sourcery no-metrics
             remwarns=remwarns,
         )
     elif gvarstatus("pmmenu") is None:
-        USER_BOT_NO_WARN = f"""**уσ 🧑‍💻 {mention}**, 
+        USER_BOT_NO_WARN = f"""**🇾​🇴​ 🧑‍💻 {mention}**, 
 
 **ωαѕѕυρ вιтch? ωнαт тнє fєck dσ υ ωαит?. 
 • υ нανє {warns}/{totalwarns} ωαяиѕ υитιℓ υ gєт 𝐁𝐋𝐎𝐂𝐊𝐄𝐃 ву мє. \
@@ -127,7 +127,7 @@ async def do_pm_permit_action(event, chat):  # sourcery no-metrics
 
 **🇵​🇲​ мє αт @ClaeyZ_UBot**"""
     else:
-        USER_BOT_NO_WARN = f"""**уσ 🧑‍💻 {mention}**, 
+        USER_BOT_NO_WARN = f"""**🇾​🇴​ 🧑‍💻 {mention}**, 
 
 **ωαѕѕυρ вιтch? ωнαт тнє fєck dσ υ ωαит?. 
 • υ нανє {warns}/{totalwarns} ωαяиѕ υитιℓ υ gєт 𝐁𝐋𝐎𝐂𝐊𝐄𝐃 ву мє. \
