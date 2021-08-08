@@ -103,9 +103,9 @@ async def bot_start(event):
                 my_mention=my_mention,
             )
         else:
-            start_msg = f"🇾​🇴​! 👤{mention},\
-                        \ní αm {my_mention}'s αѕѕιѕтαи вσт🤖.\
-                        \nуσυ cαn cσntαct hím frσm hєrє.\
+            start_msg = f"**🇾​🇴​! 👤{mention},**\
+                        \n**í αm {my_mention}'s αѕѕιѕтαиt вσт🤖.**\
+                        \n**уσυ cαn cσntαct hím frσm hєrє.**\
                         \n\n        🇦​🇸​🇸​🇮​🇸​🇹​🇦​🇳​🇹 ᵒᶠ ᶜˡᵃᵉʸ​​"
         buttons = [
             (
