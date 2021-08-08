@@ -119,21 +119,21 @@ async def do_pm_permit_action(event, chat):  # sourcery no-metrics
             remwarns=remwarns,
         )
     elif gvarstatus("pmmenu") is None:
-        USER_BOT_NO_WARN = f"""**уσ 🧑‍💻 {mention}, 
+        USER_BOT_NO_WARN = f"""**уσ 🧑‍💻 {mention}**, 
 
-ωαѕѕυρ вιтch? ωнαт тнє fєck dσ υ ωαит?. 
+**ωαѕѕυρ вιтch? ωнαт тнє fєck dσ υ ωαит?. 
 • υ нανє {warns}/{totalwarns} ωαяиѕ υитιℓ υ gєт 𝐁𝐋𝐎𝐂𝐊𝐄𝐃 ву мє. \
-נυѕт ѕкєdαddlє συт тнє ωαу υ cαmє.
+נυѕт ѕкєdαddlє συт тнє ωαу υ cαmє.**
 
-🇵​🇲​ мє αт @ClaeyZ_UBot**"""
+**🇵​🇲​ мє αт @ClaeyZ_UBot**"""
     else:
-        USER_BOT_NO_WARN = f"""**уσ 🧑‍💻 {mention}, 
+        USER_BOT_NO_WARN = f"""**уσ 🧑‍💻 {mention}**, 
 
-ωαѕѕυρ вιтch? ωнαт тнє fєck dσ υ ωαит?. 
+**ωαѕѕυρ вιтch? ωнαт тнє fєck dσ υ ωαит?. 
 • υ нανє {warns}/{totalwarns} ωαяиѕ υитιℓ υ gєт 𝐁𝐋𝐎𝐂𝐊𝐄𝐃 ву мє. \
-נυѕт ѕкєdαddlє συт тнє ωαу υ cαmє.
+נυѕт ѕкєdαddlє συт тнє ωαу υ cαmє.**
 
-🇵​🇲​ мє αт @ClaeyZ_UBot**"""
+**🇵​🇲​ мє αт @ClaeyZ_UBot**"""
     addgvar("pmpermit_text", USER_BOT_NO_WARN)
     PM_WARNS[str(chat.id)] += 1
     try:
